@@ -45,7 +45,6 @@ const generateId = () => {
     return String(Math.floor(Math.random() * (upperLimit + 1)))
 }
 app.get('/api/persons', (request, response) => {
-    // response.json(persons)
     Person
         .find({})
         .then(result => {
@@ -71,32 +70,34 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-    const person = request.body
-    if (!person.name || !person.number) {
+    if (!request.body.name || !request.body.number) {
         return response.status(400).json({
             error: 'content missing'
         })
     }
-    if (persons.find(p => p.name === person.name)) {
-        return response.status(400).json({
-            error: 'name already exists'
+    // if (persons.find(p => p.name === person.name)) {
+    //     return response.status(400).json({
+    //         error: 'name already exists'
+    //     })
+    // }
+    const newPerson = new Person({
+        name: request.body.name,
+        number: request.body.number
+    })
+    newPerson
+        .save()
+        .then(result => {
+            console.log(`added ${request.body.name} number ${request.body.number} to phonebook`)
+            response.json(newPerson)
         })
-    }
-    const newPerson = {
-        id: generateId(),
-        name: person.name,
-        number: person.number
-    }
-    persons = persons.concat(newPerson)
-    response.json(newPerson)
 })
 
 app.get('/info', (request, response) => {
     response.send(`Phonebook has info for ${persons.length} people <br> ${new Date().toUTCString()}`)
 })
 
-// process.env.PORT should come from fly.toml
-const PORT = process.env.PORT || 3001
+// when deployed, PORT is from fly.toml
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log('Server running')
 })
