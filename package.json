@@ -16,7 +16,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon --inspect index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf dist && cd ../dive-deep-web-dev-exercises/part2/phonebook/ && npm run build && cp -r dist ../../../FullstackOpen-part3/",
     "deploy": "fly deploy",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mongoose": "^8.10.0",
     "morgan": "^1.10.0"

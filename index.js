@@ -1,6 +1,8 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
+
 const app = express()
 
 morgan.token('req-body', function getBody(req) {
@@ -43,7 +45,12 @@ const generateId = () => {
     return String(Math.floor(Math.random() * (upperLimit + 1)))
 }
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    // response.json(persons)
+    Person
+        .find({})
+        .then(result => {
+            response.json(result)
+        })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -87,6 +94,8 @@ app.post('/api/persons', (request, response) => {
 app.get('/info', (request, response) => {
     response.send(`Phonebook has info for ${persons.length} people <br> ${new Date().toUTCString()}`)
 })
+
+// process.env.PORT should come from fly.toml
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log('Server running')
