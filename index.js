@@ -40,10 +40,6 @@ let persons = [
     }
 ]
 
-const generateId = () => {
-    const upperLimit = 99999
-    return String(Math.floor(Math.random() * (upperLimit + 1)))
-}
 app.get('/api/persons', (request, response) => {
     Person
         .find({})
@@ -64,9 +60,10 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    persons = persons.filter(p => p.id != id)
-    response.status(204).send()
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => {
+            response.status(204).send()
+        })
 })
 
 app.post('/api/persons', (request, response) => {
