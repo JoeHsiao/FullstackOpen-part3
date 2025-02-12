@@ -59,11 +59,27 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+
+    const person = {
+        name: request.body.name,
+        number: request.body.number
+    }
+
+    Person.findByIdAndUpdate(id, person, { new: true })
+        .then(updatedNote => {
+            response.json(updatedNote)
+        })
+        .catch(error => next(error))
+})
+
+app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
         .then(result => {
             response.status(204).send()
         })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -72,11 +88,6 @@ app.post('/api/persons', (request, response) => {
             error: 'content missing'
         })
     }
-    // if (persons.find(p => p.name === person.name)) {
-    //     return response.status(400).json({
-    //         error: 'name already exists'
-    //     })
-    // }
     const newPerson = new Person({
         name: request.body.name,
         number: request.body.number
@@ -93,6 +104,21 @@ app.get('/info', (request, response) => {
     response.send(`Phonebook has info for ${persons.length} people <br> ${new Date().toUTCString()}`)
 })
 
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name == 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+    next(error)
+}
+
+app.use(unknownEndpoint)
+app.use(errorHandler)
 // when deployed, PORT is from fly.toml
 const PORT = process.env.PORT
 app.listen(PORT, () => {
